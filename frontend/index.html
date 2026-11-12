@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Your Resume</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <main class="page">
+
+        <!-- ======== Left side : copy + illustration ======== -->
+        <section class="intro">
+            <p class="intro__eyebrow">Finish!</p>
+            <h1 class="intro__title">Upload Your Resume</h1>
+            <p class="intro__desc">
+                Uploading your resume is the optimal, safest way to submit past
+                work and cover letters. You can upload up to 5 files.
+            </p>
+
+            <!-- Illustration -->
+            <div class="intro__illustration" aria-hidden="true">
+                <svg viewBox="0 0 420 260" fill="none" xmlns="http://www.w3.org/2000/svg" role="img">
+                    <!-- speech bubble -->
+                    <g>
+                        <rect x="18" y="24" width="150" height="74" rx="12" fill="#FFFFFF" stroke="#2F4C7E" stroke-width="3"/>
+                        <circle cx="52" cy="61" r="8" fill="#2F4C7E"/>
+                        <circle cx="90" cy="61" r="8" fill="#9DBBDF"/>
+                        <circle cx="128" cy="61" r="8" fill="#2F4C7E"/>
+                    </g>
+                    <!-- dark speech bubble -->
+                    <g>
+                        <rect x="238" y="132" width="132" height="62" rx="12" fill="#1C1C1C"/>
+                        <circle cx="272" cy="163" r="7" fill="#FFFFFF"/>
+                        <circle cx="300" cy="163" r="7" fill="#FFFFFF"/>
+                        <circle cx="328" cy="163" r="7" fill="#FFFFFF"/>
+                    </g>
+                    <!-- laptop / screen -->
+                    <g>
+                        <rect x="128" y="92" width="120" height="96" rx="10" fill="#FFFFFF" stroke="#2F4C7E" stroke-width="3"/>
+                        <rect x="140" y="104" width="96" height="72" rx="6" fill="#DCE9F8"/>
+                        <path d="M116 188h144l14 26H102l14-26z" fill="#9DBBDF" stroke="#2F4C7E" stroke-width="3" stroke-linejoin="round"/>
+                    </g>
+                    <!-- cat -->
+                    <g>
+                        <!-- tail -->
+                        <path d="M60 210c-26-6-40-30-30-52 8-18 30-24 44-14" stroke="#2F4C7E" stroke-width="10" stroke-linecap="round" fill="none"/>
+                        <!-- body -->
+                        <ellipse cx="150" cy="214" rx="78" ry="34" fill="#4F7FD4"/>
+                        <!-- head -->
+                        <circle cx="228" cy="176" r="44" fill="#4F7FD4"/>
+                        <!-- ears -->
+                        <path d="M198 148l-8-26 26 12z" fill="#4F7FD4"/>
+                        <path d="M258 148l8-26-26 12z" fill="#4F7FD4"/>
+                        <!-- face -->
+                        <circle cx="214" cy="172" r="4.5" fill="#10243F"/>
+                        <circle cx="242" cy="172" r="4.5" fill="#10243F"/>
+                        <path d="M220 188c5 5 11 5 16 0" stroke="#10243F" stroke-width="3" stroke-linecap="round" fill="none"/>
+                        <!-- paws -->
+                        <circle cx="196" cy="222" r="12" fill="#2F4C7E"/>
+                        <circle cx="238" cy="228" r="12" fill="#2F4C7E"/>
+                    </g>
+                    <!-- plant -->
+                    <g>
+                        <rect x="352" y="176" width="46" height="52" rx="8" fill="#FFFFFF" stroke="#2F4C7E" stroke-width="3"/>
+                        <path d="M375 176c0-26-14-38-30-44 20-4 34 6 34 20" fill="#9DBBDF"/>
+                        <path d="M375 176c0-30 10-44 26-50-16-2-30 10-30 26" fill="#4F7FD4"/>
+                    </g>
+                    <!-- ground line -->
+                    <path d="M40 246h340" stroke="#DCE9F8" stroke-width="6" stroke-linecap="round"/>
+                </svg>
+            </div>
+        </section>
+
+        <!-- ======== Right side : upload card ======== -->
+        <section class="card-wrap">
+            <div class="card">
+                <h2 class="card__title">Upload File</h2>
+
+                <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Upload your resume">
+                    <svg class="dropzone__icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M14 34h22a8 8 0 0 0 1.3-15.9A12 12 0 0 0 13.6 15 9 9 0 0 0 14 34z" fill="#DCE9F8" stroke="#2F66D0" stroke-width="2.5" stroke-linejoin="round"/>
+                        <path d="M24 38V22m0 0-7 7m7-7 7 7" stroke="#2F66D0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <p class="dropzone__text">
+                        Move file(s) here to upload, or click to choose<br>
+                        <span>from your computer</span>
+                    </p>
+                    <input type="file" id="fileInput" multiple accept=".pdf,.doc,.docx" hidden>
+                </div>
+
+                <ul class="file-list" id="fileList"></ul>
+
+                <div class="card__actions">
+                    <button type="button" class="btn btn--secondary" id="lastStepBtn">Last step</button>
+                    <button type="button" class="btn btn--primary" id="finishBtn">Finish</button>
+                </div>
+            </div>
+
+            <!-- stepper -->
+            <nav class="stepper" aria-label="Progress">
+                <span class="stepper__dot" data-step="1"></span>
+                <span class="stepper__line"></span>
+                <span class="stepper__dot" data-step="2"></span>
+                <span class="stepper__line"></span>
+                <span class="stepper__dot" data-step="3"></span>
+                <span class="stepper__line"></span>
+                <span class="stepper__dot stepper__dot--active" data-step="4"></span>
+            </nav>
+        </section>
+
+    </main>
+
+    <script>
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('fileInput');
+        const fileList  = document.getElementById('fileList');
+
+        dropzone.addEventListener('click', () => fileInput.click());
+        dropzone.addEventListener('keydown', e => {
+            if (e.key === 'Enter' || e.key === ' ') fileInput.click();
+        });
+
+        fileInput.addEventListener('change', () => addFiles(fileInput.files));
+
+        ['dragenter', 'dragover'].forEach(ev =>
+            dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.add('is-over'); }));
+        ['dragleave', 'drop'].forEach(ev =>
+            dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.remove('is-over'); }));
+        dropzone.addEventListener('drop', e => addFiles(e.dataTransfer.files));
+
+        function addFiles(files) {
+            [...files].slice(0, 5).forEach(f => {
+                const li = document.createElement('li');
+                li.className = 'file-list__item';
+                li.textContent = '📄 ' + f.name + ' (' + (f.size / 1024).toFixed(1) + ' KB)';
+                fileList.appendChild(li);
+            });
+        }
+
+        document.getElementById('lastStepBtn').addEventListener('click', () => alert('Go back to the previous step.'));
+        document.getElementById('finishBtn').addEventListener('click', () => alert('Application finished! Thank you.'));
+    </script>
+</body>
+</html>

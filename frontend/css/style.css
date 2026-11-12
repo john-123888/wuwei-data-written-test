@@ -1,0 +1,240 @@
+/* ============================================================
+   Upload Your Resume — implemented from the Figma design
+   ============================================================ */
+
+:root {
+    --blue-900: #10243F;
+    --blue-700: #1C4A8F;
+    --blue-600: #2F66D0;
+    --blue-500: #4F7FD4;
+    --blue-200: #9DBBDF;
+    --blue-100: #DCE9F8;
+    --blue-50:  #F2F7FD;
+    --ink:      #1F2A3D;
+    --muted:    #7C8AA0;
+    --card-border: #E3EAF3;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Segoe UI", "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #FFFFFF;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+}
+
+.page {
+    min-height: 100vh;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 64px 48px 40px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+    gap: 64px;
+    align-items: start;
+}
+
+/* ---------------- Left side ---------------- */
+
+.intro__eyebrow {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 10px;
+}
+
+.intro__title {
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    color: var(--ink);
+    margin-bottom: 14px;
+}
+
+.intro__desc {
+    max-width: 420px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--muted);
+}
+
+.intro__illustration {
+    margin-top: 36px;
+    max-width: 480px;
+}
+
+.intro__illustration svg {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* ---------------- Right side ---------------- */
+
+.card-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.card {
+    background: #FFFFFF;
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    box-shadow: 0 12px 32px rgba(31, 42, 61, 0.08);
+    padding: 24px 24px 20px;
+}
+
+.card__title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 16px;
+}
+
+/* Dropzone */
+.dropzone {
+    background: var(--blue-50);
+    border: 1.5px dashed var(--blue-200);
+    border-radius: 12px;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.1s ease;
+    outline: none;
+}
+
+.dropzone:hover,
+.dropzone:focus-visible {
+    border-color: var(--blue-600);
+}
+
+.dropzone.is-over {
+    border-color: var(--blue-600);
+    background: var(--blue-100);
+    transform: scale(1.01);
+}
+
+.dropzone__icon {
+    width: 48px;
+    height: 48px;
+}
+
+.dropzone__text {
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--blue-500);
+}
+
+.dropzone__text span {
+    color: var(--muted);
+}
+
+/* Uploaded file list */
+.file-list {
+    list-style: none;
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.file-list__item {
+    font-size: 12px;
+    color: var(--ink);
+    background: var(--blue-50);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 6px 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Buttons */
+.card__actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 18px;
+    justify-content: center;
+}
+
+.btn {
+    min-width: 120px;
+    padding: 10px 22px;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: filter 0.15s ease, transform 0.05s ease;
+}
+
+.btn:active { transform: translateY(1px); }
+
+.btn--secondary {
+    background: var(--blue-100);
+    color: var(--blue-600);
+}
+
+.btn--primary {
+    background: var(--blue-600);
+    color: #FFFFFF;
+}
+
+.btn--secondary:hover,
+.btn--primary:hover { filter: brightness(0.95); }
+
+/* ---------------- Stepper ---------------- */
+
+.stepper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+}
+
+.stepper__dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--blue-100);
+    border: 2px solid var(--blue-200);
+    flex-shrink: 0;
+}
+
+.stepper__dot--active {
+    background: var(--blue-600);
+    border-color: var(--blue-600);
+    box-shadow: 0 0 0 4px rgba(47, 102, 208, 0.15);
+}
+
+.stepper__line {
+    width: 56px;
+    height: 2px;
+    background: var(--blue-100);
+}
+
+/* ---------------- Responsive ---------------- */
+
+@media (max-width: 900px) {
+    .page {
+        grid-template-columns: 1fr;
+        padding: 48px 24px 32px;
+        gap: 40px;
+    }
+
+    .intro__title { font-size: 28px; }
+    .intro__illustration { max-width: 380px; }
+    .card-wrap { max-width: 440px; }
+}
