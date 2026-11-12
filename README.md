@@ -68,21 +68,26 @@ curl -X POST -H "Content-Type: application/json" \
 
 | 列 | 说明 |
 |---|---|
-| `title` | 博客标题 |
-| `subtitle` | 副标题 |
-| `author` | 作者 |
-| `author_url` | 作者主页链接 |
-| `date` | 发布日期 |
-| `url` | 博客链接 |
-| `image_url` | 配图链接 |
-| `avatar_url` | 作者头像链接 |
+按题目要求，CSV 包含以下 6 列：
 
-> 注：原题要求的 headers 表在文档里以图片形式呈现、无法读取文本，以上字段为按页面结构选取的合理集合，如需调整改 `HEADERS` 常量即可。
+| 列 | 说明 |
+|---|---|
+| `Title` | 博客标题 |
+| `Author` | 作者 |
+| `Comment Count` | 评论数（Disqus 动态渲染，等待其加载后从列表页抓取，只保留数字） |
+| `Time` | 发布日期 |
+| `Article Content` | 文章正文（进入每篇内页抓取 `.article__body` 下的段落/列表，用换行拼接） |
+| `Images In Article` | 正文内图片 URL，多张用 `;` 分隔 |
 
-已抓取前 2 页共 **32 条**数据：
+已抓取前 2 页共 **32 篇文章**（32/32 有正文与评论数，25/32 正文含图，其余文章本身无图）：
 
 - `output/mit_blogs_playwright.csv`
 - `output/mit_blogs_drissionpage.csv`
+
+**实现思路**（两版一致）：
+
+1. 先抓列表页 `/blogs/`、`/blogs/page/2/`，拿到每篇的标题、作者、日期、链接，并等待 4 秒让 Disqus 脚本渲染出评论数
+2. 再逐篇访问文章内页，抓取正文段落与正文内图片
 
 **运行**：
 

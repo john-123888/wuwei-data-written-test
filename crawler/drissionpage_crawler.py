@@ -2,7 +2,16 @@
 Wuwei Data written test - Crawler (DrissionPage version)
 
 Crawls the MIT Admissions blog feed (https://mitadmissions.org/blogs/)
-and saves every blog teaser entry into a CSV file.
+and saves every blog entry into a CSV file with the columns required
+by the written test:
+
+    Title | Author | Comment Count | Time | Article Content | Images In Article
+
+Steps:
+    1. Visit the blog archive list page(s) to collect entry links,
+       authors, dates and comment counts (rendered by Disqus JS).
+    2. Visit every entry page to extract the article content and
+       the images inside the article body.
 
 Usage:
     pip install DrissionPage
@@ -11,8 +20,10 @@ Usage:
 
 import argparse
 import csv
+import re
 import shutil
 import sys
+import time
 from pathlib import Path
 
 from DrissionPage import ChromiumPage, ChromiumOptions
@@ -28,19 +39,23 @@ BROWSER_CANDIDATES = [
 ]
 
 HEADERS = [
-    "title",
-    "subtitle",
-    "author",
-    "author_url",
-    "date",
-    "url",
-    "image_url",
-    "avatar_url",
+    "Title",
+    "Author",
+    "Comment Count",
+    "Time",
+    "Article Content",
+    "Images In Article",
 ]
 
 
+def parse_comment_count(raw: str) -> str:
+    """'6 Comments' / '6条评论' -> '6'; empty if Disqus did not render."""
+    m = re.search(r"\d+", raw or "")
+    return m.group(0) if m else ""
+
+
 def page_url(page_number: int) -> str:
-    """The blog archive paginates as /blogs/, /blogs/page/2/, /blogs/page/3/ ..."""
+    """The blog archive paginates as /blogs/, /blogs/page/2/, ..."""
     return BASE_URL if page_number <= 1 else f"{BASE_URL}page/{page_number}/"
 
 
@@ -75,37 +90,66 @@ def crawl(pages: int) -> list[dict]:
         print("[drissionpage] no local Chrome/Edge found, using DrissionPage default")
 
     page = ChromiumPage(co)
-    # Keep per-element waits short so missing fields (no image, no subtitle, ...)
-    # do not stall the crawl for 10s each time (DrissionPage default).
+    # Keep per-element waits short so missing fields do not stall the crawl
     page.set.timeouts(base=2, page_load=60, script=10)
     try:
+        # ---- Step 1: list pages ----
+        entries: list[dict] = []
         for n in range(1, pages + 1):
             url = page_url(n)
-            print(f"[drissionpage] fetching page {n}: {url}")
+            print(f"[drissionpage] list page {n}: {url}")
             page.get(url)
             page.wait.ele_displayed("css:li.tease-feed-item", timeout=30)
+            time.sleep(4)  # give the Disqus count script time to render
 
             items = page.eles("css:li.tease-feed-item article.tease")
-            print(f"[drissionpage]   -> {len(items)} blog entries")
-
+            print(f"[drissionpage]   -> {len(items)} entries")
             for item in items:
                 link = item.ele("css:a.post-tease__h__link")
                 title = item.ele("css:.post-tease__title")
-                subtitle = item.ele("css:.post-tease__subtitle")
                 author_link = item.ele("css:.post-tease__meta-item--author a")
                 date_el = item.ele("css:.tease__meta-item--date")
-                img = item.ele("css:img.post-tease__img")
-                mug = item.ele("css:img.post-tease__author-mug")
+                comments_el = item.ele("css:.tease__meta-item--comments")
+
+                entries.append({
+                    "title": title.text.strip() if title else "",
+                    "author": author_link.text.strip() if author_link else "",
+                    "time": date_el.text.strip() if date_el else "",
+                    "url": link.attr("href") if link else "",
+                    "comment_count": comments_el.text.strip() if comments_el else "",
+                })
+
+        # ---- Step 2: article pages ----
+        for i, e in enumerate(entries, 1):
+            url = e["url"]
+            if not url:
+                continue
+            try:
+                print(f"[drissionpage] article {i}/{len(entries)}: {e['title']}")
+                page.get(url)
+                page.wait.ele_displayed("css:.article__body", timeout=30)
+
+                paras = page.eles("css:.article__body p, .article__body li")
+                content = "\n".join(
+                    p.text.strip() for p in paras if p.text.strip()
+                )
+                imgs = page.eles("css:.article__body img")
+                images = ";".join(filter(None, (img.attr("src") for img in imgs)))
 
                 rows.append({
-                    "title": title.text.strip() if title else "",
-                    "subtitle": subtitle.text.strip() if subtitle else "",
-                    "author": author_link.text.strip() if author_link else "",
-                    "author_url": author_link.attr("href") if author_link else "",
-                    "date": date_el.text.strip() if date_el else "",
-                    "url": link.attr("href") if link else "",
-                    "image_url": img.attr("src") if img else "",
-                    "avatar_url": mug.attr("src") if mug else "",
+                    "Title": e["title"],
+                    "Author": e["author"],
+                    "Comment Count": parse_comment_count(e["comment_count"]),
+                    "Time": e["time"],
+                    "Article Content": content,
+                    "Images In Article": images,
+                })
+            except Exception as exc:  # keep crawling even if one article fails
+                print(f"[drissionpage]   !! failed: {exc}", file=sys.stderr)
+                rows.append({
+                    "Title": e["title"], "Author": e["author"],
+                    "Comment Count": parse_comment_count(e["comment_count"]),
+                    "Time": e["time"], "Article Content": "", "Images In Article": "",
                 })
     finally:
         page.quit()
