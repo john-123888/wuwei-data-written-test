@@ -1,0 +1,15 @@
+{
+  "model": "hf:distilbert-sst2",
+  "num_samples": 50,
+  "accuracy": 0.84,
+  "per_class_recall": {
+    "positive": {
+      "n": 25,
+      "accuracy": 0.8
+    },
+    "negative": {
+      "n": 25,
+      "accuracy": 0.88
+    }
+  }
+}

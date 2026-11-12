@@ -1,6 +1,6 @@
 # 五维数据笔试题 / Wuwei Data Written Test
 
-杭州五维数据有限责任公司笔试题的实现，包含四部分：
+杭州五维数据有限责任公司笔试题的实现，包含五部分：
 
 | 目录 | 题目 | 技术栈 |
 |---|---|---|
@@ -8,6 +8,7 @@
 | `backend/` | HelloWorld API + 登录 API | Spring Boot 3.2.0 + Spring Security |
 | `crawler/` | 爬取 MIT Admissions 博客 | Playwright + DrissionPage（两版实现） |
 | `fastapi-streaming/` | 流式 API demo | FastAPI |
+| `algo-labeling/` | 基础模型自动标注数据集 | HuggingFace Transformers（IMDb 情感标注，84% 准确率） |
 
 > 线上 Figma 设计稿：<https://www.figma.com/design/D0jjN7Twkq0DGm3ZJvQabz/>
 
@@ -126,8 +127,31 @@ uvicorn main:app --reload --port 8000
 
 ---
 
+## 5. 基础模型自动标注 `algo-labeling/`
+
+用基础模型给公开数据集自动打标签（笔试题-算法）：
+
+- **数据集**：IMDb 影评（`stanfordnlp/imdb`），对 50 条类别均衡的测试样本做情感标注
+- **模型**：默认 `distilbert-base-uncased-finetuned-sst-2-english`，**本地运行、无需 API Key**；另提供 OpenAI 兼容接口的 LLM 后端（含 Prompt 模板）
+- **结果**：总体准确率 84%（正类召回 80% / 负类 88%），报告中含误差分析、人机对比与改进方案
+- **文件**：`demo_code.py`（可运行代码）、`example_output.csv`（示例输出）、`summary.json`（指标）、`report.md`（1-2 页报告）
+
+**运行**：
+
+```bash
+cd algo-labeling
+pip install -r requirements.txt
+python demo_code.py --num-samples 50 --backend hf
+# 中国大陆网络建议加镜像：HF_ENDPOINT=https://hf-mirror.com python demo_code.py
+```
+
+详见 [`algo-labeling/report.md`](algo-labeling/report.md)。
+
+---
+
 ## 环境要求
 
 - 后端：JDK 17+、Maven 3.8+
 - 爬虫：Python 3.10+，Playwright 版需 `playwright install chromium`；DrissionPage 版需本机有 Chrome 或 Edge
 - FastAPI：Python 3.9+
+- 自动标注：Python 3.10+，首次运行会自动从 HF 镜像下载模型（约 268MB）与数据集
